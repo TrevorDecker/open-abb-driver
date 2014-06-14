@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import abb
+import math
+import time
 
 class Arm:
     #refrence to the robot 
@@ -29,17 +31,21 @@ class Arm:
         
         #safe method for seting robots joints
     def setJoints(self,newJoints):
-        for jointNum = xrange(0:length(self.jointLimit_lower)):
-            if newJoints[jointNum] < self.jointLimit_lower[jointNum] || \
-               newJoints[jointNum] > self.jointLimit_upper[jointNum]:
-                print '{0} is not within bounds {1} and {2}'.format(jointNum, \ 
-                         jointLimit_lower[jointNum],jointLimit_upper[jointNum])
-
-
-        #TODO add spacial constraints
-         
-        #passed all joint limit test 
-        self.Robot.set_joints(joints)
+        print 'Attempting to sets joints to {0}'.format(newJoints)
+#        for jointNum in xrange(0,len(self.jointLimit_lower)):
+#            if newJoints[jointNum] < self.jointLimit_lower[jointNum] or \
+#               newJoints[jointNum] > self.jointLimit_upper[jointNum]:
+#                raise NameError('{0} is not within bounds {1} and {2}\n'.format(jointNum,\
+#jointLimit_lower[jointNum],jointLimit_upper[jointNum]))
+#
+#
+#        #TODO add spacial constraints
+#         
+#        #passed all joint limit test 
+        val = self.robot.set_joints(newJoints)
+        print val
+        time.sleep(1)
+        print 'Done'
 
     def fowardKinamatics(self):
         #TODO
@@ -48,3 +54,15 @@ class Arm:
     def inverseKinamatics(self):
         #TODO
         pass
+
+    #a method which goes to each of the joint extreams and
+    #  trys the arm at those locations so as to checks if any
+    # collisions will occur while a person is still here 
+    def checkLimits(self):
+       for i in xrange(0,int(math.pow(2,len(self.jointLimit_lower)))):
+           joints = self.jointLimit_upper
+           for jointNum in xrange(1,len(self.jointLimit_lower)+1):
+               if i % jointNum == 0:
+                   joints[jointNum] = self.jointLimit_lower[jointNum]
+           self.setJoints(joints)
+           time.sleep(1)# delays for 1 second 
